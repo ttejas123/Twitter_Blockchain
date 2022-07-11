@@ -1,0 +1,3 @@
+.scroll-mandatory-here::-webkit-scrollbar {
+    display: none;
+}
