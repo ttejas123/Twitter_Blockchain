@@ -2,19 +2,17 @@ import { useWallet } from '@solana/wallet-adapter-react';
 import React, { useEffect, useState } from 'react'
 import getTweets from '../hooks/getTweets'
 import useTweetsCreate from '../hooks/sendTweets';
-const Home = () => {
+import Tweets from './tweets';
+
+const Home = (props) => {
   const [tweets, setTweets] = useState([]);
   const [tweetData ,setTweetData] = useState('');
-  const {allTweets, tweetsFromSpecificuser} = getTweets();
-  const {create}  = useTweetsCreate();
+  const {allTweets, specificTweet} = getTweets();
+  const {create, updateTweet, deleteTweetfrom}  = useTweetsCreate();
   const wallet = useWallet();
   const getAllTweets = async () => {
     const result = await allTweets();
     setTweets(result);
-    // await create();
-    // console.log(wallet.publicKey.toString())
-    // console.log(data)
-    // await tweetsFromSpecificuser();
   }
 
   useEffect(() => {
@@ -49,10 +47,7 @@ const Home = () => {
                 tweets.map((val, index) =>  {
                     // console.log(val)
                     return (
-                        <div key={index} className='border-b px-9 py-5 hover:bg-gray-100'>
-                            <div className='flex'><div className='font-bold'>{val.authority_display}</div> <div className='ml-3 text-gray-400'>• {val.created_ago}</div></div>
-                            <div className='pt-2 text-sm'>{val.content}</div>
-                        </div>
+                        <Tweets val={val} key={index} setAddress={props.setAddress} setTab={props.setTab} setTweets={props.setTweets} tweets={props.tweets} updateTweet={updateTweet} deleteTweetfrom={deleteTweetfrom} />
                     )
                 })
             }

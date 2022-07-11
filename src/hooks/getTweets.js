@@ -18,7 +18,7 @@ const useTweets = () => {
   const allTweets = async () => {
     const tx = await program.account.tweet.all();
     const newTweetsVar =  tx.map(tweet => new Tweet(tweet.publicKey, tweet.account))
-    // setTweets(newTweetsVar);
+    // console.log(newTweetsVar)
     return newTweetsVar;
   }
 
@@ -41,23 +41,26 @@ const useTweets = () => {
         // Prefetch all tweets with their timestamps only.        
         const tweets = await program.account.tweet.all([dilterdata]);
         const newTweetsVar =  tweets.map(tweet => new Tweet(tweet.publicKey, tweet.account))
-        console.log(tweets)
+        // console.log(newTweetsVar)
         return newTweetsVar;
-        // return allTweetsWithTimestamps
-        //     .sort((a, b) => b.timestamp.cmp(a.timestamp))
-        //     .map(({ pubkey }) => pubkey)
   }
 
-  const tweetsFromSpecificuser = async (address) => {
-    let [user_pda] = await anchor.web3.PublicKey.findProgramAddress(
-        [utf8.encode('tweet'), wallet.publicKey.toBuffer()],
-        program.programId,
-    )
-    const tweets = await program.account.tweet.fetchMultiple(user_pda)
-    console.log(user_pda);
+  const specificTweet = async (address) => {
+    
+    const tweet = await program.account.tweet.fetch(address)
+    const preBuild = {
+      account:{
+        authority: tweet.authority,
+        content: tweet.content,
+        timestamp: tweet.timestamp,
+      },
+      publicKey: new PublicKey(address)
+    }
+    const Data = new Tweet(preBuild.publicKey, preBuild.account);
+    return Data;
   }
   
-  return { allTweets, specificAccountTweet, tweetsFromSpecificuser }
+  return { allTweets, specificAccountTweet, specificTweet }
 }
 
 export default useTweets

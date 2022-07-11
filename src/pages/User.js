@@ -2,35 +2,16 @@ import { useWallet } from '@solana/wallet-adapter-react';
 import React, { useEffect, useState } from 'react'
 import getTweets from '../hooks/getTweets'
 import useTweetsCreate from '../hooks/sendTweets';
-const User = () => {
-  const [tweets, setTweets] = useState([]);
+const User = (props) => {
+  // const [tweets, setTweets] = useState([]);
   const [tweetData ,setTweetData] = useState('');
   const { specificAccountTweet } = getTweets();
-  const {create}  = useTweetsCreate();
+  const {updateTweet}  = useTweetsCreate();
   const wallet = useWallet();
   const getAllTweets = async (pubKeyEntered) => {
     const result = await specificAccountTweet(pubKeyEntered);
-    setTweets(result);
-    // await create();
-    // console.log(wallet.publicKey.toString())
-    // console.log(data)
-    // await tweetsFromSpecificuser();
+    props.setTweets(result);
   }
-
-//   useEffect(() => {
-    
-//     const intervalId = setInterval(() => {
-//         if (wallet.connected) {
-//             getAllTweets()
-//         }
-//         // getTiktoks();
-//         // console.log(tiktoks);
-//       }, 2000)
-      
-//       // clear interval on re-render to avoid memory leaks
-//       return () => clearInterval(intervalId)
-//   }, [])
-
   return (
     <div className='w-full h-full border-x'>
         {/* Title */}
@@ -47,10 +28,10 @@ const User = () => {
         {/* Read Tweets */}
         <div>
             {
-                tweets.map((val, index) =>  {
+                props.tweets.map((val, index) =>  {
                     // console.log(val)
                     return (
-                        <div key={index} className='border-b px-9 py-5 hover:bg-gray-100'>
+                        <div key={index} className='border-b px-9 py-5 hover:bg-gray-100' onClick={()=> updateTweet(val.key, val.authority, `Update Content ${Date.now()}`)}>
                             <div className='flex'><div className='font-bold'>{val.authority_display}</div> <div className='ml-3 text-gray-400'>• {val.created_ago}</div></div>
                             <div className='pt-2 text-sm'>{val.content}</div>
                         </div>

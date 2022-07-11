@@ -21,12 +21,6 @@ const useTweetsCreate = () => {
   
   //create one
   const create = async (content) => {
-    const randomKey = anchor.web3.Keypair.generate().publicKey;
-    let [tweet_pda] = await anchor.web3.PublicKey.findProgramAddress(
-      [utf8.encode("tweet")],
-      program.programId,
-    )
-
     const tweet = web3.Keypair.generate()
     
     // console.log(wallet.publicKey.toBuffer())
@@ -46,53 +40,33 @@ const useTweetsCreate = () => {
     
   }
 
-  //read all
-  const allTweets = async () => {
-    const tx = await program.account.tweet.all();
-    // console.log(tx);
-    // setAccount(true);
-    return tx;
+  const updateTweet = async (publicKey, authoritykey, content) => {
+    // let content  = "Well it's not hard but not easy eather :>";
+    if(authoritykey.toString() == wallet.publicKey.toString()){
+      // console.log(content)
+      await program.rpc.updateTweet(content, {
+        accounts: {
+          authority: authoritykey.toString(),
+          tweet: publicKey,
+        },
+      })
+    }
   }
 
-  //read one
-  const specificAccounts = async () => {
-    let [user_pda] = await anchor.web3.PublicKey.findProgramAddress(
-      [utf8.encode('user'), wallet.publicKey.toBuffer()],
-      program.programId,
-    )
-
-    try {
-      const userInfo = await program.account.userAccount.fetch(user_pda)
-      console.log(userInfo)
-    } catch (e) {
-      
-    }   
+  const deleteTweetfrom = async (publicKey, authoritykey) => {
+    // let content  = "Well it's not hard but not easy eather :>";
+    if(authoritykey.toString() == wallet.publicKey.toString()){
+      // console.log(content)
+      await program.rpc.deleteTweet({
+        accounts: {
+          authority: authoritykey.toString(),
+          tweet: publicKey,
+        },
+      })
+    }
   }
 
-  //update Account
-  const updateAccount = async () => {
-    let [user_pda] = await anchor.web3.PublicKey.findProgramAddress(
-      [utf8.encode('user'), wallet.publicKey.toBuffer()],
-      program.programId,
-    )
-
-    let profileAA = "https://picsum.photos/200/300"
-    let name = "Updated Tejas"
-
-    const tx = await program.rpc.updateUser(name, profileAA, {
-      accounts: {
-        user: user_pda,
-        authority: wallet.publicKey,
-        ...defaultAccounts,
-      },
-    })
-
-    console.log(tx);
-  }
-
-
-
-  return { create, allTweets, specificAccounts, updateAccount }
+  return { create, updateTweet, deleteTweetfrom }
 }
 
 export default useTweetsCreate
